@@ -115,3 +115,49 @@ export const loginUser = async (correo, password) => {
     throw err;
   }
 };
+
+export const registerUser = async (correo, password, nombre, rol) => {
+  const url = buildUrl("/register");
+  const payload = { correo, password, nombre, rol };
+  const headers = {
+    "Content-Type": "application/json",
+  }
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+      mode: "cors",
+      credentials: "include",
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || `POST ${url} → ${res.status}`);
+    }
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const logoutUser = async () => {
+  const url = buildUrl("/logout");
+
+  try {
+    // Intentar cerrar sesión en el backend (si existe el endpoint)
+    await fetch(url, {
+      method: "POST",
+      mode: "cors",
+      credentials: "include",
+    });
+  } catch (err) {
+    console.warn("Logout backend no disponible, limpiando local igual.");
+  }
+
+  // Limpiar token de localStorage
+  localStorage.removeItem("token");
+
+  return true;
+};
+
+
